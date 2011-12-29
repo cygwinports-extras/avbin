@@ -1,0 +1,26 @@
+DESCRIPTION="FFmpeg API abstraction library"
+HOMEPAGE="http://avbin.github.com/"
+SRC_URI="https://github.com/downloads/AVbin/AVbin/avbin-avbin-source-v${PV}.tar.bz2"
+SRC_URI+=" Makefile.cygwin"
+SRC_DIR=.
+
+PKG_NAMES="libavbin1 libavbin-devel"
+libavbin1_CONTENTS="usr/bin/cygavbin-1.dll usr/share/"
+libavbin_devel_CONTENTS="usr/include/ usr/lib/"
+
+src_compile() {
+	lndirs
+	cd ${B}
+	cygmake \
+		AVBIN_VERSION=1 \
+		FFMPEG_REVISION=99999 \
+		PLATFORM=cygwin \
+		FFMPEG=/usr/include
+}
+
+src_install() {
+	cd ${B}
+	dobin dist/cygwin/*.dll
+	dolib dist/cygwin/*.a
+	doinclude include/*.h
+}

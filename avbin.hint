@@ -1,0 +1,5 @@
+category: Audio Video
+sdesc: "FFmpeg API abstraction library (sources)"
+ldesc: "AVbin is a thin cross-platform wrapper around FFmpeg's video and 
+audio decoding functionality, providing binary compatibility for 
+applications and languages that need it."
