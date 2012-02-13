@@ -1,0 +1,116 @@
+--- origsrc/src/avbin.c	2011-12-12 23:32:59.000000000 -0600
++++ src/src/avbin.c	2012-02-12 20:07:19.424460600 -0600
+@@ -28,10 +28,12 @@
+ #include <libavformat/avformat.h>
+ #include <libavcodec/avcodec.h>
+ #include <libavutil/avutil.h>
++#include <libavutil/dict.h>
+ #include <libswscale/swscale.h>
+ 
+ struct _AVbinFile {
+     AVFormatContext *context;
++    AVDictionary *format_options;
+     AVPacket *packet;
+ };
+ 
+@@ -129,7 +131,7 @@ AVbinFile *avbin_open_filename_with_form
+     AVInputFormat *avformat = NULL;
+     if (format) avformat = av_find_input_format(format);
+ 
+-    if (av_open_input_file(&file->context, filename, avformat, 0, NULL) != 0)
++    if (avformat_open_input(&file->context, filename, avformat, &file->format_options) != 0)
+         goto error;
+ 
+     if (av_find_stream_info(file->context) < 0)
+@@ -176,20 +178,38 @@ AVbinResult avbin_seek_file(AVbinFile *f
+ 
+ AVbinResult avbin_file_info(AVbinFile *file, AVbinFileInfo *info)
+ {
++    AVDictionaryEntry *result;
++
+     if (info->structure_size < sizeof *info)
+         return AVBIN_RESULT_ERROR;
+ 
+     info->n_streams = file->context->nb_streams;
+     info->start_time = file->context->start_time;
+     info->duration = file->context->duration;
+-    memcpy(info->title, file->context->title, sizeof(info->title));
+-    memcpy(info->author, file->context->author, sizeof(info->author));
+-    memcpy(info->copyright, file->context->copyright, sizeof(info->copyright));
+-    memcpy(info->comment, file->context->comment, sizeof(info->comment));
+-    memcpy(info->album, file->context->album, sizeof(info->album));
+-    info->year = file->context->year;
+-    info->track = file->context->track;
+-    memcpy(info->genre, file->context->genre, sizeof(info->genre));
++
++    result = av_dict_get(file->format_options, "title", NULL, 0);
++    strncpy(info->title, result->value, sizeof(info->title));
++
++    result = av_dict_get(file->format_options, "artist", NULL, 0);
++    strncpy(info->author, result->value, sizeof(info->author));
++
++    result = av_dict_get(file->format_options, "copyright", NULL, 0);
++    strncpy(info->copyright, result->value, sizeof(info->copyright));
++
++    result = av_dict_get(file->format_options, "comment", NULL, 0);
++    strncpy(info->comment, result->value, sizeof(info->comment));
++
++    result = av_dict_get(file->format_options, "album", NULL, 0);
++    strncpy(info->album, result->value, sizeof(info->album));
++
++    result = av_dict_get(file->format_options, "year", NULL, 0);
++    info->year = strtol(result->value, NULL, 10);
++
++    result = av_dict_get(file->format_options, "track", NULL, 0);
++    info->track = strtol(result->value, NULL, 10);
++
++    result = av_dict_get(file->format_options, "genre", NULL, 0);
++    strncpy(info->genre, result->value, sizeof(info->genre));
+ 
+     return AVBIN_RESULT_OK;
+ }
+@@ -210,7 +230,7 @@ int avbin_stream_info(AVbinFile *file, i
+ 
+     switch (context->codec_type)
+     {
+-        case CODEC_TYPE_VIDEO:
++        case AVMEDIA_TYPE_VIDEO:
+             info->type = AVBIN_STREAM_TYPE_VIDEO;
+             info->video.width = context->width;
+             info->video.height = context->height;
+@@ -231,7 +251,7 @@ int avbin_stream_info(AVbinFile *file, i
+                     info_8->video.frame_rate_den *= 1000;
+             }
+             break;
+-        case CODEC_TYPE_AUDIO:
++        case AVMEDIA_TYPE_AUDIO:
+             info->type = AVBIN_STREAM_TYPE_AUDIO;
+             info->audio.sample_rate = context->sample_rate;
+             info->audio.channels = context->channels;
+@@ -283,7 +303,7 @@ AVbinStream *avbin_open_stream(AVbinFile
+     stream->format_context = file->context;
+     stream->codec_context = codec_context;
+     stream->type = codec_context->codec_type;
+-    if (stream->type == CODEC_TYPE_VIDEO)
++    if (stream->type == AVMEDIA_TYPE_VIDEO)
+         stream->frame = avcodec_alloc_frame();
+     else
+         stream->frame = NULL;
+@@ -326,7 +346,7 @@ int avbin_decode_audio(AVbinStream *stre
+                        uint8_t *data_out, int *size_out)
+ {
+     int used;
+-    if (stream->type != CODEC_TYPE_AUDIO)
++    if (stream->type != AVMEDIA_TYPE_AUDIO)
+         return AVBIN_RESULT_ERROR;
+ 
+     AVPacket packet;
+@@ -354,7 +374,7 @@ int avbin_decode_video(AVbinStream *stre
+     int height = stream->codec_context->height;
+     int used;
+ 
+-    if (stream->type != CODEC_TYPE_VIDEO)
++    if (stream->type != AVMEDIA_TYPE_VIDEO)
+         return AVBIN_RESULT_ERROR;
+ 
+     AVPacket packet;

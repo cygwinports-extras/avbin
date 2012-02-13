@@ -3,6 +3,7 @@ HOMEPAGE="http://avbin.github.com/"
 SRC_URI="https://github.com/downloads/AVbin/AVbin/avbin-avbin-source-v${PV}.tar.bz2"
 SRC_URI+=" Makefile.cygwin"
 SRC_DIR=.
+PATCH_URI="ffmpeg010.patch"
 
 PKG_NAMES="libavbin1 libavbin-devel"
 libavbin1_CONTENTS="usr/bin/cygavbin-1.dll usr/share/"
