@@ -1,4 +1,4 @@
-SONAME=cygavbin-$(AVBIN_VERSION).dll
+SONAME=cygavbin-1.dll
 LIBNAME=$(OUTDIR)/$(SONAME)
 
 CFLAGS += -O3

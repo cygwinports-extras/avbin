@@ -1,7 +1,0 @@
-category: Audio Video
-requires: libavbin1
-external-source: avbin
-sdesc: "FFmpeg API abstraction library (development)"
-ldesc: "AVbin is a thin cross-platform wrapper around FFmpeg's video and 
-audio decoding functionality, providing binary compatibility for 
-applications and languages that need it."

@@ -1,0 +1,44 @@
+GIT_URI="git://github.com/AVbin/AVbin.git"
+GIT_TAG=${P}
+inherit git
+
+NAME="avbin"
+VERSION=10
+RELEASE=1
+CATEGORY="Audio Video"
+SUMMARY="FFmpeg API abstraction library"
+DESCRIPTION="AVbin is a thin cross-platform wrapper around FFmpeg's video and
+audio decoding functionality, providing binary compatibility for applications
+and languages that need it."
+HOMEPAGE="http://avbin.github.com/"
+SRC_URI+=" cygwin.Makefile"
+
+PKG_NAMES="libavbin1 libavbin-devel"
+libavbin1_CONTENTS="usr/bin/cygavbin-1.dll usr/share/"
+libavbin_devel_CONTENTS="usr/include/ usr/lib/"
+
+src_compile() {
+	lndirs
+	cd ${B}
+	mkdir -p build
+	cygmake \
+		AVBIN_VERSION=${VERSION} \
+		AVBIN_VERSION_STRING="\"${VERSION}\"" \
+		AVBIN_BUILD_DATE="\"$(date +"%Y-%m-%d %H:%M:%S %z")\"" \
+		AVBIN_REPO="\"${GIT_URI}\"" \
+		AVBIN_COMMIT="\"2759c1c4f74a842dec7df5a0956fbdef99c4b3d5\"" \
+		AVBIN_BACKEND="\"FFmpeg\"" \
+		AVBIN_BACKEND_VERSION_STRING="\"1.0.3\"" \
+		AVBIN_BACKEND_REPO="\"git://source.ffmpeg.org/ffmpeg.git\"" \
+		AVBIN_BACKEND_COMMIT="\"f7bf3becf6792378e7d29cff140c4d19889bd5f5\"" \
+		BACKEND=ffmpeg \
+		BACKEND_DIR=/usr/include \
+		PLATFORM=cygwin
+}
+
+src_install() {
+	cd ${B}
+	dobin dist/cygwin/*.dll
+	dolib dist/cygwin/*.a
+	doinclude include/*.h
+}
