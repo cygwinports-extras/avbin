@@ -4,7 +4,7 @@ inherit git
 
 NAME="avbin"
 VERSION=10
-RELEASE=1
+RELEASE=2
 CATEGORY="Audio Video"
 SUMMARY="FFmpeg API abstraction library"
 DESCRIPTION="AVbin is a thin cross-platform wrapper around FFmpeg's video and
@@ -28,9 +28,9 @@ src_compile() {
 		AVBIN_REPO="\"${GIT_URI}\"" \
 		AVBIN_COMMIT="\"2759c1c4f74a842dec7df5a0956fbdef99c4b3d5\"" \
 		AVBIN_BACKEND="\"FFmpeg\"" \
-		AVBIN_BACKEND_VERSION_STRING="\"1.0.3\"" \
-		AVBIN_BACKEND_REPO="\"git://source.ffmpeg.org/ffmpeg.git\"" \
-		AVBIN_BACKEND_COMMIT="\"f7bf3becf6792378e7d29cff140c4d19889bd5f5\"" \
+		AVBIN_BACKEND_VERSION_STRING="\"1.2.3\"" \
+		AVBIN_BACKEND_REPO="\"git://git.videolan.org/ffmpeg.git\"" \
+		AVBIN_BACKEND_COMMIT="\"26617b47faccaf3646b767ed3062affd8252499d\"" \
 		BACKEND=ffmpeg \
 		BACKEND_DIR=/usr/include \
 		PLATFORM=cygwin
